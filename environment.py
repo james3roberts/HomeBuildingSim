@@ -19,209 +19,171 @@ class Environment:
             "material_amount"
         ]
 
-        self.time_remaining = 10 #days to build the house i mean this must be a tract and should only be 5 or less
+        self.time_remaining = 10   # ✅ FIXED
         self.history = []
 
-    def move_wood(self, agent):
-        # progress depends on agent ability (template-driven via stats)
-        progress_increment = agent.strength + agent.tool_skills
+    # -------------------------
+    # CORE ACTION ENGINE
+    # -------------------------
+    def _perform_action(
+        self,
+        agent,
+        action_name,
+        progress_key,
+        progress_increment,
+        stamina_cost,
+        xp_gain
+    ):
+        if agent.stamina <= 0:
+            self.history.append(f"{agent.username} is too exhausted to work.")
+            return False
 
-        # stamina cost scales with strength
-        stamina_cost = 3 - (agent.strength // 2)
-        if stamina_cost < 1:
-            stamina_cost = 1
+        if self.time_remaining <= 0:
+            self.history.append("No time remaining.")
+            return False
 
-        # apply progress (for now we attach this to floor prep)
-        self.progress["floor"] += progress_increment
-        if self.progress["floor"] > 100:
-            self.progress["floor"] = 100
+        # apply progress
+        self.progress[progress_key] += progress_increment
+        if self.progress[progress_key] > 100:
+            self.progress[progress_key] = 100
 
         # apply agent effects
         agent.stamina -= stamina_cost
-        agent.experience += 1
+        agent.experience += xp_gain
 
-        # log action
+        # consume time
+        self.time_remaining -= 1
+
+        # log
         self.history.append(
-            f"{agent.username} moved wood "
-            f"(+{progress_increment} floor, -{stamina_cost} stamina)"
-        )
-    
-    def cut_wood(self,agent):
-        progress_increment = agent.tool_skills
-        stamina_cost = 2
-
-        self.progress["floor"] += progress_increment
-        if self.progress["floor"] > 100:
-            self.progress["floor"]=100
-
-        agent.stamina -= stamina_cost
-        agent.experience += 1
-
-        self.history.append(
-            f"{agent.username} cut wood"
-            f"(+{progress_increment} floor, -{stamina_cost} stamina)"
+            f"{agent.username} {action_name} "
+            f"(+{progress_increment} {progress_key}, -{stamina_cost} stamina)"
         )
 
-    def layout_floor(self,agent):
-        progress_increment = agent.strength + agent.tool_skills
-        stamina_cost = 4
+        return True
 
-        self.progress["floor"] += progress_increment
-        if self.progress["floor"] > 100:
-            self.progress["floor"]=100
+    # -------------------------
+    # ACTIONS
+    # -------------------------
+    def move_wood(self, agent):
+        progress = agent.strength + agent.tool_skills
+        stamina = max(1, 3 - (agent.strength // 2))
 
-        agent.stamina -= stamina_cost
-        agent.experience += 2
-
-        self.history.append(
-            f"{agent.username} layout floor"
-            f"(+{progress_increment} floor, -{stamina_cost} stamina)"
+        self._perform_action(
+            agent,
+            action_name="moved wood",
+            progress_key="floor",
+            progress_increment=progress,
+            stamina_cost=stamina,
+            xp_gain=1
         )
 
-    def frame_floor(self,agent):
-        progress_increment = agent.strength + agent.tool_skills
-        stamina_cost = 5
-
-        self.progress["floor"] += progress_increment
-        if self.progress["floor"] > 100:
-            self.progress["floor"]=100
-
-        agent.stamina -= stamina_cost
-        agent.experience += 3
-
-        self.history.append(
-            f"{agent.username} frame floor"
-            f"(+{progress_increment} floor, -{stamina_cost} stamina)"
-        )
-            
-    def layout_walls(self,agent):
-        progress_increment = agent.strength + agent.tool_skills
-        stamina_cost = 5
-
-        self.progress["walls"] += progress_increment
-        if self.progress["walls"] > 100:
-            self.progress["walls"]=100
-
-        agent.stamina -= stamina_cost
-        agent.experience += 3
-
-        self.history.append(
-            f"{agent.username} layout walls"
-            f"(+{progress_increment} walls, -{stamina_cost} stamina)"
+    def cut_wood(self, agent):
+        self._perform_action(
+            agent,
+            action_name="cut wood",
+            progress_key="floor",
+            progress_increment=agent.tool_skills,
+            stamina_cost=2,
+            xp_gain=1
         )
 
-    def frame_walls(self,agent):
-        progress_increment = agent.strength + agent.tool_skills
-        stamina_cost = 5
-
-        self.progress["walls"] += progress_increment
-        if self.progress["walls"] > 100:
-            self.progress["walls"]=100
-
-        agent.stamina -= stamina_cost
-        agent.experience += 3
-
-        self.history.append(
-            f"{agent.username} frame walls"
-            f"(+{progress_increment} walls, -{stamina_cost} stamina)"
+    def layout_floor(self, agent):
+        self._perform_action(
+            agent,
+            action_name="laid out floor",
+            progress_key="floor",
+            progress_increment=agent.strength + agent.tool_skills,
+            stamina_cost=4,
+            xp_gain=2
         )
 
-    def layout_floor2(self,agent):
-        progress_increment = agent.strength + agent.tool_skills
-        stamina_cost = 4
-
-        self.progress["floor2"] += progress_increment
-        if self.progress["floor2"] > 100:
-            self.progress["floor2"]=100
-
-        agent.stamina -= stamina_cost
-        agent.experience += 2
-
-        self.history.append(
-            f"{agent.username} layout floor 2"
-            f"(+{progress_increment} floor2, -{stamina_cost} stamina)"
-        )
-    
-
-    def frame_floor2(self,agent):
-        progress_increment = agent.strength + agent.tool_skills
-        stamina_cost = 5
-
-        self.progress["floor2"] += progress_increment
-        if self.progress["floor2"] > 100:
-            self.progress["floor2"]=100
-
-        agent.stamina -= stamina_cost
-        agent.experience += 3
-
-        self.history.append(
-            f"{agent.username} frame floor2"
-            f"(+{progress_increment} floor2, -{stamina_cost} stamina)"
-        )
-    
-
-
-    def layout_stairs(self,agent):
-        progress_increment = agent.strength + agent.tool_skills
-        stamina_cost = 5
-
-        self.progress["stairs"] += progress_increment
-        if self.progress["stairs"] > 100:
-            self.progress["stairs"]=100
-
-        agent.stamina -= stamina_cost
-        agent.experience += 3
-
-        self.history.append(
-            f"{agent.username} layout stairs"
-            f"(+{progress_increment} stairs, -{stamina_cost} stamina)"
+    def frame_floor(self, agent):
+        self._perform_action(
+            agent,
+            action_name="framed floor",
+            progress_key="floor",
+            progress_increment=agent.strength + agent.tool_skills,
+            stamina_cost=5,
+            xp_gain=3
         )
 
-
-    def frame_stairs(self,agent):
-        progress_increment = agent.strength + agent.tool_skills
-        stamina_cost = 5
-
-        self.progress["stairs"] += progress_increment
-        if self.progress["stairs"] > 100:
-            self.progress["stairs"]=100
-
-        agent.stamina -= stamina_cost
-        agent.experience += 3
-
-        self.history.append(
-            f"{agent.username} frame stairs"
-            f"(+{progress_increment} stairs, -{stamina_cost} stamina)"
+    def layout_walls(self, agent):
+        self._perform_action(
+            agent,
+            action_name="laid out walls",
+            progress_key="walls",
+            progress_increment=agent.strength + agent.tool_skills,
+            stamina_cost=5,
+            xp_gain=3
         )
 
-    def layout_roof(self,agent):
-        progress_increment = agent.strength + agent.tool_skills
-        stamina_cost = 5
-
-        self.progress["roof"] += progress_increment
-        if self.progress["roof"] > 100:
-            self.progress["roof"]=100
-
-        agent.stamina -= stamina_cost
-        agent.experience += 3
-
-        self.history.append(
-            f"{agent.username} layout roof"
-            f"(+{progress_increment} roof, -{stamina_cost} stamina)"
+    def frame_walls(self, agent):
+        self._perform_action(
+            agent,
+            action_name="framed walls",
+            progress_key="walls",
+            progress_increment=agent.strength + agent.tool_skills,
+            stamina_cost=5,
+            xp_gain=3
         )
 
-    def frame_roof(self,agent):
-        progress_increment = agent.strength + agent.tool_skills
-        stamina_cost = 5
+    def layout_floor2(self, agent):
+        self._perform_action(
+            agent,
+            action_name="laid out second floor",
+            progress_key="floor2",
+            progress_increment=agent.strength + agent.tool_skills,
+            stamina_cost=4,
+            xp_gain=2
+        )
 
-        self.progress["roof"] += progress_increment
-        if self.progress["roof"] > 100:
-            self.progress["roof"]=100
+    def frame_floor2(self, agent):
+        self._perform_action(
+            agent,
+            action_name="framed second floor",
+            progress_key="floor2",
+            progress_increment=agent.strength + agent.tool_skills,
+            stamina_cost=5,
+            xp_gain=3
+        )
 
-        agent.stamina -= stamina_cost
-        agent.experience += 3
+    def layout_stairs(self, agent):
+        self._perform_action(
+            agent,
+            action_name="laid out stairs",
+            progress_key="stairs",
+            progress_increment=agent.strength + agent.tool_skills,
+            stamina_cost=5,
+            xp_gain=3
+        )
 
-        self.history.append(
-            f"{agent.username} frame roof"
-            f"(+{progress_increment} roof, -{stamina_cost} stamina)"
+    def frame_stairs(self, agent):
+        self._perform_action(
+            agent,
+            action_name="framed stairs",
+            progress_key="stairs",
+            progress_increment=agent.strength + agent.tool_skills,
+            stamina_cost=5,
+            xp_gain=3
+        )
+
+    def layout_roof(self, agent):
+        self._perform_action(
+            agent,
+            action_name="laid out roof",
+            progress_key="roof",
+            progress_increment=agent.strength + agent.tool_skills,
+            stamina_cost=5,
+            xp_gain=3
+        )
+
+    def frame_roof(self, agent):
+        self._perform_action(
+            agent,
+            action_name="framed roof",
+            progress_key="roof",
+            progress_increment=agent.strength + agent.tool_skills,
+            stamina_cost=5,
+            xp_gain=3
         )

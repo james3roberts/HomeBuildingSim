@@ -2,20 +2,15 @@
 from agent import Agent
 from config import templates
 from environment import Environment
-#from scenario import Scenario
+# from scenario import Scenario
 
-print("\n")
-print("\n")
 print("Welcome to the Home building Simulator")
 print("While I am sure you are excited to get started, I need to know some things?")
 user_name = input("What would you like to be called? ")
 print("Welcome to the crew", user_name)
-print("\n")
 
 print('There are 3 different levels, which one would you like. ("please enter the number")')
 print("1.Rookie, 2.Skilled Worker, 3.Forman")
-print("\n")
-print("\n")
 
 
 try:
@@ -33,8 +28,6 @@ else:
     print("It looks like you did not understand the question, so you must me a Rookie")
     user_template=1
      
-print("\n")
-print("\n")
 
 print("Now I need to know how you spend you night after work. 1. getting lots of sleep, 2. being a night owl, 3. drinking ?")
 
@@ -56,62 +49,94 @@ else:
     print("It looks like you did not understand the question, so you must drink a lot!")
     night_life=3
 
-print("\n")
-print("\n")
 
 print("Testing if user info loads")
 agent = Agent(user_name, user_template, night_life)
-agent.print_stats()
+# agent.print_stats()
 
-print("\n")
-print("\n")
 
 print("before calling the environment page")
 
 env = Environment()
-print(env.progress)
+# print(env.progress)
 
 env.move_wood(agent)
 
-print("\n")
-print("\n")
 
 print("=== AFTER move_wood ===")
-agent.print_stats()
-print(env.progress)
-print(env.history)
+# agent.print_stats()
+# print(env.progress)
+# print(env.history)
 
 
 
-print("\n")
-print("\n")
 env.cut_wood(agent)
 print("=== AFTER cut_wood ===")
-agent.print_stats()
-print(env.progress)
-print(env.history)
+# agent.print_stats()
+# print(env.progress)
+# print(env.history)
 
 
-print("\n")
-print("\n")
 env.layout_floor(agent)
 print("=== AFTER layout_floor ===")
-agent.print_stats()
-print(env.progress)
-print(env.history)
+# agent.print_stats()
+# print(env.progress)
+# print(env.history)
 
-print("\n")
-print("\n")
 env.frame_floor(agent)
 print("=== AFTER frame_floor ===")
-agent.print_stats()
-print(env.progress)
-print(env.history)
+# agent.print_stats()
+# print(env.progress)
+# print(env.history)
 
-print("\n")
-print("\n")
-env.move_wood(agent)
-print("=== AFTER move wood ===")
+env.layout_walls(agent)
+print("=== AFTER layout walls ===")
+# agent.print_stats()
+# print(env.progress)
+# print(env.history)
+
+env.frame_walls(agent)
+print("=== AFTER frame walls ===")
+# agent.print_stats()
+# print(env.progress)
+# print(env.history)
+
+
+env.layout_floor2(agent)
+print("=== 2nd floor layout ===")
+# agent.print_stats()
+# print(env.progress)
+# print(env.history)
+
+
+env.frame_floor2(agent)
+print("=== 2nd floor building  ===")
+# agent.print_stats()
+# print(env.progress)
+# print(env.history)
+
+env.layout_stairs(agent)
+print("=== layout stairs  ===")
+# agent.print_stats()
+# print(env.progress)
+# print(env.history)
+
+
+env.frame_stairs(agent)
+print("=== build stairs  ===")
+# agent.print_stats()
+# print(env.progress)
+# print(env.history)
+
+
+env.layout_roof(agent)
+print("=== AFTER layout roof ===")
+# agent.print_stats()
+# print(env.progress)
+# print(env.history)
+
+env.frame_roof(agent)
+print("=== AFTER frame roof ===")
 agent.print_stats()
 print(env.progress)
 print(env.history)
