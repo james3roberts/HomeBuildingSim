@@ -3,6 +3,8 @@ class Environment:
         self.active_tools = ["Muscles", "Nail Gun", "Saw", "Tape"]
 
         self.progress = {
+            "wood_moved": 0,
+            "wood_cut": 0,
             "floor": 0,
             "walls": 0,
             "floor2": 0,
@@ -72,24 +74,38 @@ class Environment:
         self._perform_action(
             agent,
             action_name="moved wood",
-            progress_key="floor",
+            progress_key="wood_moved",
             progress_increment=progress,
             stamina_cost=stamina,
             xp_gain=1
         )
 
     def cut_wood(self, agent):
-        self._perform_action(
+        if self.progress["wood_moved"] <75: #this number might need to change
+            self.history.append (
+            "Not enough wood moved to cut!"
+            f"({self.progress['wood_moved']}/75)." #this number might need to change
+            )
+            return False
+        return self._perform_action(
             agent,
             action_name="cut wood",
-            progress_key="floor",
+            progress_key="wood_cut",
             progress_increment=agent.tool_skills,
             stamina_cost=2,
             xp_gain=1
         )
 
     def layout_floor(self, agent):
-        self._perform_action(
+        #build order rule
+        if self.progress["wood_moved"] < 75:
+            self.history.append(
+                "Not enough wood moved to start floor layout!"
+                f"({self.progress['wood_moved']}/75)."
+            )
+            return False
+        
+        return  self._perform_action(
             agent,
             action_name="laid out floor",
             progress_key="floor",
@@ -99,7 +115,13 @@ class Environment:
         )
 
     def frame_floor(self, agent):
-        self._perform_action(
+        if self.progress["floor"] <75: ##this number might need to change
+            self.history.append(
+                "Not enough layout completed to build floor"
+                f"({self.progress['floor']}/75)."    #this number might need to change
+            )
+            return False
+        return self._perform_action(
             agent,
             action_name="framed floor",
             progress_key="floor",
@@ -109,7 +131,13 @@ class Environment:
         )
 
     def layout_walls(self, agent):
-        self._perform_action(
+        if self.progress["floor"] <75: ##this number might need to change
+            self.history.append(
+                "Not enough floor completed to layout walls"
+                f"({self.progress['floor']}/75)."    #this number might need to change
+            )
+            return False
+        return self._perform_action(
             agent,
             action_name="laid out walls",
             progress_key="walls",
@@ -119,7 +147,13 @@ class Environment:
         )
 
     def frame_walls(self, agent):
-        self._perform_action(
+        if self.progress["walls"] <75: ##this number might need to change
+            self.history.append(
+                "Not enough layout completed to build walls"
+                f"({self.progress['walls']}/75)."    #this number might need to change
+            )
+            return False
+        return self._perform_action(
             agent,
             action_name="framed walls",
             progress_key="walls",
@@ -129,7 +163,13 @@ class Environment:
         )
 
     def layout_floor2(self, agent):
-        self._perform_action(
+        if self.progress["walls"] <75: ##this number might need to change
+            self.history.append(
+                "Not enough walls built to layout 2nd floor"
+                f"({self.progress['walls']}/75)."    #this number might need to change
+            )
+            return False
+        return self._perform_action(
             agent,
             action_name="laid out second floor",
             progress_key="floor2",
@@ -139,7 +179,13 @@ class Environment:
         )
 
     def frame_floor2(self, agent):
-        self._perform_action(
+        if self.progress["floor2"] <75: ##this number might need to change
+            self.history.append(
+                "Not enough layout completed to build 2nd floor"
+                f"({self.progress['floor2']}/75)."    #this number might need to change
+            )
+            return False
+        return self._perform_action(
             agent,
             action_name="framed second floor",
             progress_key="floor2",
@@ -149,7 +195,13 @@ class Environment:
         )
 
     def layout_stairs(self, agent):
-        self._perform_action(
+        if self.progress["floor2"] <75: ##this number might need to change
+            self.history.append(
+                "Not enough floor finished to build stairs"
+                f"({self.progress['floor2']}/75)."    #this number might need to change
+            )
+            return False
+        return self._perform_action(
             agent,
             action_name="laid out stairs",
             progress_key="stairs",
@@ -159,7 +211,13 @@ class Environment:
         )
 
     def frame_stairs(self, agent):
-        self._perform_action(
+        if self.progress["stairs"] <75: ##this number might need to change
+            self.history.append(
+                "Not enough layout completed to build fstairs"
+                f"({self.progress['stairs']}/75)."    #this number might need to change
+            )
+            return False
+        return self._perform_action(
             agent,
             action_name="framed stairs",
             progress_key="stairs",
@@ -168,8 +226,48 @@ class Environment:
             xp_gain=3
         )
 
+
+    def layout_walls2(self, agent):
+        if self.progress["floor2"] <75: ##this number might need to change
+            self.history.append(
+                "Not enough floor completed to layout walls"
+                f"({self.progress['floor2']}/75)."    #this number might need to change
+            )
+            return False
+        return self._perform_action(
+            agent,
+            action_name="laid out walls",
+            progress_key="walls2",
+            progress_increment=agent.strength + agent.tool_skills,
+            stamina_cost=5,
+            xp_gain=3
+        )
+
+    def frame_walls2(self, agent):
+        if self.progress["walls2"] <75: ##this number might need to change
+            self.history.append(
+                "Not enough layout completed to build walls"
+                f"({self.progress['walls2']}/75)."    #this number might need to change
+            )
+            return False
+        return self._perform_action(
+            agent,
+            action_name="framed walls",
+            progress_key="walls2",
+            progress_increment=agent.strength + agent.tool_skills,
+            stamina_cost=5,
+            xp_gain=3
+        )
+
+
     def layout_roof(self, agent):
-        self._perform_action(
+        if self.progress["walls2"] <75: ##this number might need to change
+            self.history.append(
+                "Not enough layout completed to build walls"####
+                f"({self.progress['walls2']}/75)."    #this number might need to change
+            )
+            return False
+        return self._perform_action(
             agent,
             action_name="laid out roof",
             progress_key="roof",
@@ -179,7 +277,13 @@ class Environment:
         )
 
     def frame_roof(self, agent):
-        self._perform_action(
+        if self.progress["roof"] <75: ##this number might need to change
+            self.history.append(
+                "Not enough layout completed to build roof"
+                f"({self.progress['roof']}/75)."    #this number might need to change
+            )
+            return False
+        return self._perform_action(
             agent,
             action_name="framed roof",
             progress_key="roof",
