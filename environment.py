@@ -213,7 +213,7 @@ class Environment:
     def frame_stairs(self, agent):
         if self.progress["stairs"] <75: ##this number might need to change
             self.history.append(
-                "Not enough layout completed to build fstairs"
+                "Not enough layout completed to build stairs"
                 f"({self.progress['stairs']}/75)."    #this number might need to change
             )
             return False
@@ -291,3 +291,59 @@ class Environment:
             stamina_cost=5,
             xp_gain=3
         )
+## action area
+
+    def get_available_actions(self, agent):
+        actions = []
+        if agent.stamina > 0 and self.time_remaining>0:
+            actions.append("move_wood")
+
+        if self.progress["wood_moved"]>=75:
+            actions.append("cut_wood")
+            actions.append("layout_floor")
+
+        if self.progress["floor"]>=75:
+            actions.append("frame_floor")
+            actions.append("layout_walls")
+
+        if self.progress["walls"] >= 75:
+            actions.append("frame_walls")
+            actions.append("layout_floor2")
+
+        if self.progress["floor2"] >= 75:
+            actions.append("frame_floor2")
+            actions.append("layout_stairs")
+            actions.append("layout_walls2")
+
+        if self.progress["stairs"] >= 75:
+            actions.append("frame_stairs")
+
+        if self.progress["walls2"] >= 75:
+            actions.append("layout_roof")
+
+        if self.progress["roof"] >= 75:
+            actions.append("frame_roof")
+
+        return actions
+        # -------------------------
+    # ACTION EXECUTION
+    # -------------------------
+    def execute_action(self, agent, action_name):
+
+        available = self.get_available_actions(agent)
+
+        if action_name not in available:
+            self.history.append(
+                f"INVALID ACTION: {action_name}"
+            )
+            return False
+
+        action_fn = getattr(self, action_name, None)
+
+        if not action_fn:
+            self.history.append(
+                f"UNKNOWN ACTION: {action_name}"
+            )
+            return False
+
+        return action_fn(agent)

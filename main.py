@@ -49,94 +49,40 @@ else:
     print("It looks like you did not understand the question, so you must drink a lot!")
     night_life=3
 
-
-print("Testing if user info loads")
 agent = Agent(user_name, user_template, night_life)
-# agent.print_stats()
-
-
-print("before calling the environment page")
-
 env = Environment()
-# print(env.progress)
-
-env.move_wood(agent)
 
 
-print("=== AFTER move_wood ===")
-# agent.print_stats()
-# print(env.progress)
-# print(env.history)
+while env.time_remaining > 0:
+
+    available = env.get_available_actions(agent)
+
+    print("\nAVAILABLE ACTIONS:", available)
+
+    
+    if not available:
+        print("\nNo actions available — crew is exhausted or time ran out.")
+        break
+    
+    print("\nChoose an action:")
+
+    for i, action in enumerate(available, start=1):
+        print(f"{i}. {action}")
+
+    try:
+        choice = int(input("Enter number: "))
+        chosen = available[choice - 1]
+    except (ValueError, IndexError):
+        print("Invalid choice — losing time due to confusion.")
+        env.time_remaining -= 1
+        continue
 
 
+    print("Executing:", chosen)
 
-env.cut_wood(agent)
-print("=== AFTER cut_wood ===")
-# agent.print_stats()
-# print(env.progress)
-# print(env.history)
+    env.execute_action(agent, chosen)
 
 
-env.layout_floor(agent)
-print("=== AFTER layout_floor ===")
-# agent.print_stats()
-# print(env.progress)
-# print(env.history)
-
-env.frame_floor(agent)
-print("=== AFTER frame_floor ===")
-# agent.print_stats()
-# print(env.progress)
-# print(env.history)
-
-env.layout_walls(agent)
-print("=== AFTER layout walls ===")
-# agent.print_stats()
-# print(env.progress)
-# print(env.history)
-
-env.frame_walls(agent)
-print("=== AFTER frame walls ===")
-# agent.print_stats()
-# print(env.progress)
-# print(env.history)
-
-
-env.layout_floor2(agent)
-print("=== 2nd floor layout ===")
-# agent.print_stats()
-# print(env.progress)
-# print(env.history)
-
-
-env.frame_floor2(agent)
-print("=== 2nd floor building  ===")
-# agent.print_stats()
-# print(env.progress)
-# print(env.history)
-
-env.layout_stairs(agent)
-print("=== layout stairs  ===")
-# agent.print_stats()
-# print(env.progress)
-# print(env.history)
-
-
-env.frame_stairs(agent)
-print("=== build stairs  ===")
-# agent.print_stats()
-# print(env.progress)
-# print(env.history)
-
-
-env.layout_roof(agent)
-print("=== AFTER layout roof ===")
-# agent.print_stats()
-# print(env.progress)
-# print(env.history)
-
-env.frame_roof(agent)
-print("=== AFTER frame roof ===")
-agent.print_stats()
-print(env.progress)
-print(env.history) 
+    agent.print_stats()
+    print(env.progress)
+    print("\n".join(env.history))
