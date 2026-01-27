@@ -291,10 +291,31 @@ class Environment:
             stamina_cost=5,
             xp_gain=3
         )
+    def rest (self, agent):
+        recovered = 4
+        
+        #night life and recovery
+        if agent.night_life ==1:
+            recovered +=3
+        elif recovered==3:
+            recovered-=2
+        if recovered <1:
+            recovered=1
+        
+        agent.stamina += recovered
+        self.time_remaining -= 1
+        self.history.append(
+            f"{agent.username}rested and recovered{recovered} stamina."
+        )
+        return True
 ## action area
 
     def get_available_actions(self, agent):
         actions = []
+
+        if agent.stamina <=3:
+            actions.append("rest")  #just added in step 1 
+
         if agent.stamina > 0 and self.time_remaining>0:
             actions.append("move_wood")
 
@@ -345,5 +366,7 @@ class Environment:
                 f"UNKNOWN ACTION: {action_name}"
             )
             return False
-
+        #is this where I add the code from step 2
         return action_fn(agent)
+    
+    
